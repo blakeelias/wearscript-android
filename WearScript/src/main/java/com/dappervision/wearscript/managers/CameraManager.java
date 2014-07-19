@@ -374,7 +374,7 @@ public class CameraManager extends Manager implements Camera.PreviewCallback {
                     if (FocusModes != null && FocusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO)) {
                         params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
                     }
-                    params.setPreviewFpsRange(30000, 30000);
+                    params.setPreviewFpsRange(5000, 5000);
                     camera.setParameters(params);
                     int frameWidth = params.getPreviewSize().width;
                     int frameHeight = params.getPreviewSize().height;
