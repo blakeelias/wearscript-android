@@ -252,6 +252,14 @@ public class BackgroundService extends Service implements AudioRecord.OnRecordPo
                     a.finish();
                 }
             });
+            cameraStop();
+        }
+    }
+
+    private void cameraStop() {
+        CameraManager cm = ((CameraManager) getManager(CameraManager.class));
+        if (cm != null) {
+            cm.cameraStreamStop();
         }
     }
 
@@ -288,6 +296,7 @@ public class BackgroundService extends Service implements AudioRecord.OnRecordPo
                 }
             }
             updateActivityView(ActivityEvent.Mode.WEBVIEW);
+            cameraStop();
         }
     }
 

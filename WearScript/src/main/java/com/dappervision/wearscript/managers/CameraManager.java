@@ -288,27 +288,7 @@ public class CameraManager extends Manager implements Camera.PreviewCallback {
 
     public void stateChange() {
         synchronized (this) {
-            Log.d(TAG, String.format("stateChange: mediaPauseCount: %d screenIsOn: %s activityVisible: %s streamOn: %s background: %s", mediaPauseCount , screenIsOn, activityVisible, streamOn, background));
-            boolean cameraStream = streamOn && mediaPauseCount == 0;
-            if (screenIsOn) {
-                if (activityVisible) {
-                    if (cameraStream)
-                        cameraStreamStart();
-                    else
-                        cameraStreamStop();
-                } else {
-                    cameraStreamStop();
-                }
-            } else {
-                if (background) {
-                    if (cameraStream)
-                        cameraStreamStart();
-                    else
-                        cameraStreamStop();
-                } else {
-                    cameraStreamStop();
-                }
-            }
+            cameraStreamStart();
         }
     }
 
