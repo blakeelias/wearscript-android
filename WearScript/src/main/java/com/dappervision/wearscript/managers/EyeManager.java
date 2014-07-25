@@ -10,7 +10,6 @@ import com.dappervision.wearscript.events.CallbackRegistration;
 import com.google.android.glass.eye.EyeGesture;
 import com.google.android.glass.eye.EyeGestureManager;
 
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 public class EyeManager extends Manager {
@@ -64,7 +63,7 @@ public class EyeManager extends Manager {
     }
 
     private void initial() {
-        if (eyeGestureManager.isDetectorPersistentlyEnabled(EyeGesture.WINK))
+        /*if (eyeGestureManager.isDetectorPersistentlyEnabled(EyeGesture.WINK))
             detectorState.add(EyeGesture.WINK.getId());
         if (eyeGestureManager.isDetectorPersistentlyEnabled(EyeGesture.DOUBLE_WINK))
             detectorState.add(EyeGesture.DOUBLE_WINK.getId());
@@ -75,7 +74,7 @@ public class EyeManager extends Manager {
         if (eyeGestureManager.isDetectorPersistentlyEnabled(EyeGesture.DON))
             detectorState.add(EyeGesture.DON.getId());
         for (Integer id : detectorState)
-            Log.d(TAG, "State: " + id);
+            Log.d(TAG, "State: " + id);*/
     }
 
     private void setup(boolean systemWide) {
