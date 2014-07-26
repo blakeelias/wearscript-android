@@ -391,17 +391,14 @@ public class CameraManager extends Manager implements Camera.PreviewCallback {
             if (this.camera == null) {
                 return;
             }
+            cameraStreamStop();
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    cameraStreamStart();
+                }
+            }, 60000);
             Log.d(TAG, "Preview Frame received. Frame size: " + data.length + ": camflow");
-            if (numSkip > 0) {
-                numSkip -= 1;
-                addCallbackBuffer();
-                return;
-            }
-            if (System.nanoTime() - lastImageSaveTime < imagePeriod) {
-                Log.d(TAG, "Frame skipping: " + (System.nanoTime() - lastImageSaveTime) + " < " + imagePeriod);
-                addCallbackBuffer();
-                return;
-            }
             Log.d(TAG, "CamPath: Got frame");
             lastImageSaveTime = System.nanoTime();
             cameraFrame.setFrame(data);
