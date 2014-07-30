@@ -19,6 +19,7 @@ import com.dappervision.wearscript.events.CameraEvents;
 import com.dappervision.wearscript.events.OpenCVLoadEvent;
 import com.dappervision.wearscript.events.OpenCVLoadedEvent;
 import com.dappervision.wearscript.events.StartActivityEvent;
+import com.memora.CameraTimerService;
 
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -40,6 +41,8 @@ public class CameraManager extends Manager implements Camera.PreviewCallback {
     * 3. Camera photo button pressed
     * 4. Media called inside wearscript (cameraPhoto or cameraVideo)
     * */
+    BackgroundService backgroundService;
+
     public static final String LOCAL = "0";
     public static final String PHOTO = "PHOTO";
     public static final String PHOTO_PATH = "PHOTO_PATH";
@@ -66,6 +69,7 @@ public class CameraManager extends Manager implements Camera.PreviewCallback {
 
     public CameraManager(BackgroundService bs) {
         super(bs);
+        backgroundService = bs;
         reset();
     }
 
@@ -117,7 +121,9 @@ public class CameraManager extends Manager implements Camera.PreviewCallback {
                     Log.d(TAG, "camflow: Starting as paused");
                     streamOn = false;
                 }
+                Intent cameraTimerService = new Intent(backgroundService, CameraTimerService.class);
                 stateChange();
+                backgroundService.startService(cameraTimerService);
             } else {
                 Log.d(TAG, "camflow: Resetting");
                 reset();
@@ -392,12 +398,7 @@ public class CameraManager extends Manager implements Camera.PreviewCallback {
                 return;
             }
             cameraStreamStop();
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    cameraStreamStart();
-                }
-            }, 60000);
+
             Log.d(TAG, "Preview Frame received. Frame size: " + data.length + ": camflow");
             Log.d(TAG, "CamPath: Got frame");
             lastImageSaveTime = System.nanoTime();
@@ -408,7 +409,14 @@ public class CameraManager extends Manager implements Camera.PreviewCallback {
             }
             Log.d(TAG, "CameraFrame Sent: " + System.nanoTime());
             Utils.eventBusPost(new CameraEvents.Frame(cameraFrame, this));
+            cameraPreviewCompleteCallback();
         }
+    }
+
+    private void cameraPreviewCompleteCallback(){
+        Intent serviceIntent = new Intent(backgroundService, CameraTimerService.class);
+        serviceIntent.putExtra(CameraTimerService.JOB_EXTRA, CameraTimerService.PICTURE_TAKEN);
+        backgroundService.startService(serviceIntent);
     }
 
     public void addCallbackBuffer() {
