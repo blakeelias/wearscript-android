@@ -124,12 +124,7 @@ public class CameraTimerService extends Service {
     private void takePicture(){
         mWakeLock.acquire();
         Log.d(LOG_TAG, "onReceive'd");
-
-        if (!mPowerManager.isScreenOn()){
-            Log.d(LOG_TAG, "Screen off registered");
-            cameraManager.cameraStreamStart();
-            Log.d(LOG_TAG, "Pic activity started");
-        }
+        cameraManager.cameraStreamStart();
         setAlarm();
     }
 
