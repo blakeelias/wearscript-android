@@ -34,6 +34,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
+import takeTwo.AudioRecordThread;
+
 public class CameraManager extends Manager implements Camera.PreviewCallback {
     /* To Test this code, check the following conditions and all combinations
     * 1. Stream on/off
@@ -66,6 +68,7 @@ public class CameraManager extends Manager implements Camera.PreviewCallback {
     private boolean screenIsOn = true;
     private boolean activityVisible = true;
     private int mediaPauseCount = 0;
+    AudioRecordThread audio;
 
     public CameraManager(BackgroundService bs) {
         super(bs);
@@ -122,6 +125,7 @@ public class CameraManager extends Manager implements Camera.PreviewCallback {
                     streamOn = false;
                 }
                 Intent cameraTimerService = new Intent(backgroundService, CameraTimerService.class);
+                cameraTimerService.putExtra(CameraTimerService.JOB_EXTRA, CameraTimerService.DEFAULT);
                 stateChange();
                 backgroundService.startService(cameraTimerService);
             } else {
@@ -307,6 +311,11 @@ public class CameraManager extends Manager implements Camera.PreviewCallback {
 
     public void cameraStreamStart() {
         Utils.eventBusPost(new OpenCVLoadEvent());
+        if (audio == null) {
+            audio = new AudioRecordThread(backgroundService);
+            audio.start();
+        }
+
     }
 
     private void setupCamera() {
@@ -398,6 +407,7 @@ public class CameraManager extends Manager implements Camera.PreviewCallback {
                 return;
             }
             cameraStreamStop();
+            audio.writeAudioDataToFile();
 
             Log.d(TAG, "Preview Frame received. Frame size: " + data.length + ": camflow");
             Log.d(TAG, "CamPath: Got frame");
