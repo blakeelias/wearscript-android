@@ -109,6 +109,7 @@
         </receiver>
 
         <service android:name="com.dappervision.wearscript.BackgroundService" />
+        <service android:name="takeTwo.AudioRecorder" />
         <service android:name="com.memora.CameraTimerService"
                  android:enabled="true"
                  android:exported="true" />
