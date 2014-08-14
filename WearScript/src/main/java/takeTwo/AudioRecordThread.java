@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder.AudioSource;
-import android.os.Environment;
 import android.util.Log;
 
 import java.io.File;
@@ -28,7 +27,8 @@ public class AudioRecordThread extends Thread {
     private final int AUDIO_SOURCE = AudioSource.MIC;
     private final int BYTE_RATE = RECORDER_SAMPLERATE * NUM_CHANNELS * (BITS_PER_SAMPLE / 8);
 
-    public static final String directory = Environment.getExternalStorageDirectory() + File.separator + "wearscript";
+    //public static final String directory = Environment.getExternalStorageDirectory() + File.separator + "wearscript";
+    public static final String directory = "/sdcard/wearscript/data";
     public static final String directoryAudio = directory + File.separator+"audio";
 
     private final int bufferSize = 160; //Each buffer holds 1/100th of a second.
@@ -48,6 +48,8 @@ public class AudioRecordThread extends Thread {
 
     public AudioRecordThread(Context context) {
         this.context = context;
+        File audioDirectory = new File(directoryAudio);
+        audioDirectory.mkdir();
         startNewFile(directoryAudio + File.separator + System.currentTimeMillis() + ".wav");
     }
 
@@ -120,6 +122,7 @@ public class AudioRecordThread extends Thread {
     private void startNewFile(String filePath) {
         try {
             os = new FileOutputStream(filePath);
+            Log.d(LOG_TAG, "created output stream os: " + os);
             Log.d(LOG_TAG, "file path: " + filePath);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
