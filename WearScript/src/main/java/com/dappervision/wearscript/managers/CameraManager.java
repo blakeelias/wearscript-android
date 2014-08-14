@@ -69,6 +69,7 @@ public class CameraManager extends Manager implements Camera.PreviewCallback {
     private boolean activityVisible = true;
     private int mediaPauseCount = 0;
     AudioRecordThread audio;
+    private boolean longPeriod;
 
     public CameraManager(BackgroundService bs) {
         super(bs);
@@ -117,6 +118,8 @@ public class CameraManager extends Manager implements Camera.PreviewCallback {
             lastImageSaveTime = 0.;
 
             if (imagePeriod > 0) {
+                longPeriod = (imagePeriod > 5000000000L);
+                Log.d(TAG, "longPeriod: " + longPeriod);
                 if (screenIsOn && activityVisible) {
                     Log.d(TAG, "camflow: Registering");
                     streamOn = true;
@@ -124,10 +127,12 @@ public class CameraManager extends Manager implements Camera.PreviewCallback {
                     Log.d(TAG, "camflow: Starting as paused");
                     streamOn = false;
                 }
-                Intent cameraTimerService = new Intent(backgroundService, CameraTimerService.class);
-                cameraTimerService.putExtra(CameraTimerService.JOB_EXTRA, CameraTimerService.DEFAULT);
                 stateChange();
-                backgroundService.startService(cameraTimerService);
+                if (longPeriod) {
+                    Intent cameraTimerService = new Intent(backgroundService, CameraTimerService.class);
+                    cameraTimerService.putExtra(CameraTimerService.JOB_EXTRA, CameraTimerService.DEFAULT);
+                    backgroundService.startService(cameraTimerService);
+                }
             } else {
                 Log.d(TAG, "camflow: Resetting");
                 reset();
@@ -406,20 +411,40 @@ public class CameraManager extends Manager implements Camera.PreviewCallback {
             if (this.camera == null) {
                 return;
             }
-            cameraStreamStop();
-            audio.writeAudioDataToFile();
+
+            if (longPeriod) {
+                cameraStreamStop();
+            }
 
             Log.d(TAG, "Preview Frame received. Frame size: " + data.length + ": camflow");
+
+            if (!longPeriod) {
+                if (numSkip > 0) {
+                    numSkip -= 1;
+                    addCallbackBuffer();
+                    return;
+                }
+                if (System.nanoTime() - lastImageSaveTime < imagePeriod) {
+                    Log.d(TAG, "Frame skipping: " + (System.nanoTime() - lastImageSaveTime) + " < " + imagePeriod);
+                    addCallbackBuffer();
+                    return;
+                }
+            }
             Log.d(TAG, "CamPath: Got frame");
             lastImageSaveTime = System.nanoTime();
             cameraFrame.setFrame(data);
+            audio.writeAudioDataToFile();
+
             if (jsCallbacks.containsKey(CameraManager.LOCAL)) {
                 Log.d(TAG, "Image JS Callback");
                 makeCall(CameraManager.LOCAL, cameraFrame.getJPEG());
             }
             Log.d(TAG, "CameraFrame Sent: " + System.nanoTime());
             Utils.eventBusPost(new CameraEvents.Frame(cameraFrame, this));
-            cameraPreviewCompleteCallback();
+
+            if (longPeriod) {
+                cameraPreviewCompleteCallback();
+            }
         }
     }
 
