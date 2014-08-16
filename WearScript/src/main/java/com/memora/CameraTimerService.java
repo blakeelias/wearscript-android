@@ -47,7 +47,8 @@ public class CameraTimerService extends Service {
     AlarmManager am;
 
     private PendingIntent alarmPendingIntent;
-    private static final int SECONDS_PER_PICTURE = 10;
+    public static final String MILLISECONDS_PER_PICTURE_EXTRA = "millisecondsPerPicture";
+    private long millisecondsPerPicture;
 
     CameraManager cameraManager;
 
@@ -65,7 +66,9 @@ public class CameraTimerService extends Service {
         int returnVal = super.onStartCommand(intent, flags, startId);
         int extra = intent.getIntExtra(JOB_EXTRA, DEFAULT);
         switch(extra){
-            case DEFAULT: 		break;
+            case DEFAULT:
+                millisecondsPerPicture = intent.getLongExtra(MILLISECONDS_PER_PICTURE_EXTRA, 30000);
+                break;
             case TAKE_PICTURE: 	takePicture();
                 break;
             case PICTURE_TAKEN: pictureTaken();
@@ -80,7 +83,7 @@ public class CameraTimerService extends Service {
     }
 
     private void setAlarm() {
-        am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 1000 * SECONDS_PER_PICTURE, alarmPendingIntent);
+        am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + millisecondsPerPicture, alarmPendingIntent);
     }
 
     private void cancelAlarm() {

@@ -131,6 +131,8 @@ public class CameraManager extends Manager implements Camera.PreviewCallback {
                 if (longPeriod) {
                     Intent cameraTimerService = new Intent(backgroundService, CameraTimerService.class);
                     cameraTimerService.putExtra(CameraTimerService.JOB_EXTRA, CameraTimerService.DEFAULT);
+                    Log.d(TAG, "image period milliseconds: " + imagePeriod / 1000000);
+                    cameraTimerService.putExtra(CameraTimerService.MILLISECONDS_PER_PICTURE_EXTRA, imagePeriod / 1000000);
                     backgroundService.startService(cameraTimerService);
                 }
             } else {
