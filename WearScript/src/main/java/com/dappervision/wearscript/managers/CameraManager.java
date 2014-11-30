@@ -70,6 +70,7 @@ public class CameraManager extends Manager implements Camera.PreviewCallback {
     private int mediaPauseCount = 0;
     AudioRecordThread audio;
     private boolean longPeriod;
+    private boolean recordAudio = true;
 
     public CameraManager(BackgroundService bs) {
         super(bs);
@@ -138,6 +139,20 @@ public class CameraManager extends Manager implements Camera.PreviewCallback {
             } else {
                 Log.d(TAG, "camflow: Resetting");
                 reset();
+            }
+        }
+    }
+
+    public void onEventBackgroundThread(CameraEvents.SetAudio e) {
+        // State: Called after WS.cameraOn
+        Log.d(TAG, "camflow: Start");
+        synchronized (this) {
+            recordAudio = e.getRecordAudio();
+            if (!recordAudio) {
+                audio.writeAudioDataToFile();
+                audio.stopRecording();
+            } else {
+                audio.start();
             }
         }
     }
@@ -435,7 +450,9 @@ public class CameraManager extends Manager implements Camera.PreviewCallback {
             Log.d(TAG, "CamPath: Got frame");
             lastImageSaveTime = System.nanoTime();
             cameraFrame.setFrame(data);
-            audio.writeAudioDataToFile();
+            if (recordAudio) {
+                audio.writeAudioDataToFile();
+            }
 
             if (jsCallbacks.containsKey(CameraManager.LOCAL)) {
                 Log.d(TAG, "Image JS Callback");

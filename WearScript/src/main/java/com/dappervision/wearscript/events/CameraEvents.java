@@ -55,4 +55,16 @@ public class CameraEvents {
         }
 
     }
+
+    public static class SetAudio {
+        private boolean recordAudio;
+
+        public SetAudio(boolean recordAudio) {
+            this.recordAudio = recordAudio;
+        }
+
+        public boolean getRecordAudio() {
+            return recordAudio;
+        }
+    }
 }

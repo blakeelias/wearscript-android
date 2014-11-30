@@ -252,6 +252,11 @@ public class WearScript {
     }
 
     @JavascriptInterface
+    public void setAudioRecord(boolean audioRecord) {
+        Utils.eventBusPost(new CameraEvents.SetAudio(audioRecord));
+    }
+
+    @JavascriptInterface
     public void cameraPhotoData(String callback) {
         CallbackRegistration cr = new CallbackRegistration(CameraManager.class, callback);
         cr.setEvent(CameraManager.PHOTO);

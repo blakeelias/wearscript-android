@@ -955,6 +955,11 @@ function WearScript() {
     this.cameraOff = function () {
         WSRAW.cameraOff();
     }
+
+    this.setAudioRecord = function (recordAudio) {
+        WSRAW.setAudioRecord(recordAudio);
+    }
+
     this.activityCreate = function () {
         WSRAW.activityCreate();
     }
